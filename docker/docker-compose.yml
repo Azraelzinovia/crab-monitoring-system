@@ -1,0 +1,131 @@
+version: "3.9"
+
+services:
+  # ── PostgreSQL Database ──────────────────────────────────────────────────────
+  db:
+    image: postgres:15-alpine
+    container_name: crab_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: crab_monitoring
+      POSTGRES_USER: crab_admin
+      POSTGRES_PASSWORD: crab_secure_2024
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=C"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crab_admin -d crab_monitoring"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - crab_network
+
+  # ── Redis Cache ──────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: crab_redis
+    restart: unless-stopped
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - crab_network
+
+  # ── FastAPI Backend ──────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ../docker/Dockerfile.backend
+    container_name: crab_backend
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://crab_admin:crab_secure_2024@db:5432/crab_monitoring
+      - REDIS_URL=redis://redis:6379
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - LOG_LEVEL=INFO
+      - IMAGE_STORAGE_PATH=/app/storage/images
+    volumes:
+      - ./backend:/app
+      - ./ai_models:/app/ai_models
+      - ./scraping:/app/scraping
+      - storage_data:/app/storage
+      - ./logs:/app/logs
+      - /dev/bus/usb:/dev/bus/usb  # USB cameras
+      # Uncomment for Pi Camera:
+      # - /dev/video0:/dev/video0
+      # - /dev/video1:/dev/video1
+    devices:
+      - /dev/video0:/dev/video0   # Camera 1
+      - /dev/video1:/dev/video1   # Camera 2
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - crab_network
+    privileged: true  # Required for camera access
+
+  # ── React Frontend ───────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../docker/Dockerfile.frontend
+    container_name: crab_frontend
+    restart: unless-stopped
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+      - REACT_APP_WS_URL=ws://localhost:8000
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - crab_network
+
+  # ── Nginx Reverse Proxy ──────────────────────────────────────────────────────
+  nginx:
+    image: nginx:alpine
+    container_name: crab_nginx
+    restart: unless-stopped
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      - storage_data:/app/storage:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - crab_network
+
+volumes:
+  postgres_data:
+    driver: local
+  storage_data:
+    driver: local
+
+networks:
+  crab_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24

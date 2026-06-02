@@ -1,0 +1,72 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.Python
+.venv/
+venv/
+env/
+
+# Environment
+.env
+*.env.local
+
+# AI Model weights (large binary files)
+ai_models/weights/*.pt
+ai_models/weights/*.onnx
+ai_models/weights/*.bin
+
+# Node.js
+frontend/node_modules/
+frontend/build/
+frontend/.env.local
+
+# Logs
+logs/
+*.log
+
+# Storage (user data)
+storage/
+
+# Database
+*.db
+*.sqlite3
+
+# Docker
+docker/data/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# Datasets (large files — track separately)
+datasets/kaggle/
+datasets/scraped/*.json
+
+# Calibration outputs
+ai_models/calibration/
+
+# Process IDs
+.backend.pid
+.frontend.pid
+
+# Alembic
+alembic/versions/
+
+# Pytest
+.pytest_cache/
+htmlcov/
+.coverage

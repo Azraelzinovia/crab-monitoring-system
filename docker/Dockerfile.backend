@@ -1,0 +1,70 @@
+# ── Backend Dockerfile ────────────────────────────────────────────────────────
+# Multi-stage build untuk Raspberry Pi 5 (ARM64)
+# Stage 1: Builder
+FROM python:3.11-slim-bookworm AS builder
+
+WORKDIR /app
+
+# System dependencies untuk OpenCV dan library lainnya
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    g++ \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libgl1-mesa-glx \
+    libglib2.0-dev \
+    libhdf5-dev \
+    pkg-config \
+    curl \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip wheel setuptools && \
+    pip install --no-cache-dir -r requirements.txt
+
+# ── Stage 2: Runtime ──────────────────────────────────────────────────────────
+FROM python:3.11-slim-bookworm AS runtime
+
+WORKDIR /app
+
+# Runtime system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender1 \
+    libgl1-mesa-glx \
+    libgstreamer1.0-0 \
+    libgstreamer-plugins-base1.0-0 \
+    v4l-utils \
+    curl \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy installed packages from builder
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+# Copy application code
+COPY . .
+
+# Create necessary directories
+RUN mkdir -p storage/images logs ai_models/weights
+
+# Non-root user untuk keamanan
+RUN groupadd -r crabapp && useradd -r -g crabapp crabapp && \
+    chown -R crabapp:crabapp /app
+USER crabapp
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", \
+     "--workers", "1", "--log-level", "info", "--no-access-log"]
