@@ -1,0 +1,29 @@
+# Dataset YOLO untuk deteksi kepiting
+# Letakkan file ini di: datasets/yolo/crab_yolo.yaml
+
+path  : datasets/yolo        # Root dataset
+train : images/train         # Training images (relative to path)
+val   : images/val           # Validation images
+test  : images/test          # Test images (optional)
+
+# Classes
+nc: 4
+names:
+  0: Kepiting Bakau
+  1: Kepiting Rajungan
+  2: Kepiting Lumpur
+  3: Kepiting Batu
+
+# Recommended augmentation settings
+# (diatur otomatis oleh Ultralytics, bisa di-override)
+hsv_h: 0.015     # Image HSV-Hue augmentation
+hsv_s: 0.7       # Image HSV-Saturation augmentation
+hsv_v: 0.4       # Image HSV-Value augmentation
+degrees: 30.0    # Image rotation (+/- deg)
+translate: 0.1   # Image translation (+/- fraction)
+scale: 0.5       # Image scale (+/- gain)
+shear: 0.0       # Image shear (+/- deg)
+flipud: 0.3      # Image flip up-down (probability)
+fliplr: 0.5      # Image flip left-right (probability)
+mosaic: 1.0      # Image mosaic (probability)
+mixup: 0.1       # Image mixup (probability)

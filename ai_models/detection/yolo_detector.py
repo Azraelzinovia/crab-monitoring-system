@@ -3,7 +3,12 @@ YOLOv8 Crab Detector
 Mendeteksi kepiting dalam frame menggunakan YOLOv8 dengan ByteTrack tracking.
 """
 
-import cv2
+try:
+    import cv2  # type: ignore[import]
+    CV2_AVAILABLE = True
+except ImportError:
+    cv2 = None  # type: ignore[assignment]
+    CV2_AVAILABLE = False
 import numpy as np
 import logging
 import os

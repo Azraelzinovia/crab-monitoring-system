@@ -3,13 +3,21 @@ Health Classifier — Klasifikasi kondisi kesehatan kepiting
 Status: Sehat, Kurang Sehat, Sakit, Mati
 """
 
-import cv2
+try:
+    import cv2  # type: ignore[import]   # pip install opencv-python-headless
+    CV2_AVAILABLE = True
+except ImportError:
+    cv2 = None  # type: ignore[assignment]
+    CV2_AVAILABLE = False
+
 import numpy as np
 import logging
 import os
 from typing import Dict
 
 logger = logging.getLogger(__name__)
+if not CV2_AVAILABLE:
+    logger.warning("cv2 not found — install: pip install opencv-python-headless")
 
 HEALTH_LABELS = ["Sehat", "Kurang Sehat", "Sakit", "Mati"]
 

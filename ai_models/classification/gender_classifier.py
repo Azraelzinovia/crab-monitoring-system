@@ -3,7 +3,12 @@ Gender Classifier — Identifikasi jenis kelamin kepiting
 Berdasarkan: bentuk abdomen, cangkang, dan ciri visual
 """
 
-import cv2
+try:
+    import cv2  # type: ignore[import]
+    CV2_AVAILABLE = True
+except ImportError:
+    cv2 = None  # type: ignore[assignment]
+    CV2_AVAILABLE = False
 import numpy as np
 import logging
 import os
