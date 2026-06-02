@@ -58,14 +58,14 @@ class HealthClassifier:
         try:
             onnx_path = self.model_path.replace(".pt", ".onnx")
             if os.path.exists(onnx_path):
-                import onnxruntime as ort
+                import onnxruntime as ort  # type: ignore[import]
                 self.session = ort.InferenceSession(onnx_path, providers=["CPUExecutionProvider"])
                 self.input_name = self.session.get_inputs()[0].name
                 logger.info(f"✅ Health classifier loaded: {onnx_path}")
                 return
 
             if os.path.exists(self.model_path):
-                import torch
+                import torch  # type: ignore[import]
                 self.model = torch.load(self.model_path, map_location="cpu")
                 self.model.eval()
                 logger.info(f"✅ Health classifier loaded: {self.model_path}")
@@ -127,7 +127,7 @@ class HealthClassifier:
                 outputs = self.session.run(None, {self.input_name: preprocessed})
                 logits = outputs[0][0]
             elif self.model:
-                import torch
+                import torch  # type: ignore[import]
                 with torch.no_grad():
                     output = self.model(torch.from_numpy(preprocessed))
                     logits = output.numpy()[0]

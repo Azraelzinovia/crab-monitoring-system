@@ -42,7 +42,7 @@ class SpeciesClassifier:
             # Try ONNX first (faster on Pi)
             onnx_path = self.model_path.replace(".pt", ".onnx")
             if os.path.exists(onnx_path):
-                import onnxruntime as ort
+                import onnxruntime as ort  # type: ignore[import]
                 self.session = ort.InferenceSession(
                     onnx_path,
                     providers=["CPUExecutionProvider"]
@@ -53,7 +53,7 @@ class SpeciesClassifier:
 
             # Try PyTorch
             if os.path.exists(self.model_path):
-                import torch
+                import torch  # type: ignore[import]
                 self.model = torch.load(self.model_path, map_location="cpu")
                 self.model.eval()
                 logger.info(f"✅ Species classifier loaded (PyTorch): {self.model_path}")
@@ -99,7 +99,7 @@ class SpeciesClassifier:
                 outputs = self.session.run(None, {self.input_name: preprocessed})
                 logits = outputs[0][0]
             elif self.model is not None:
-                import torch
+                import torch  # type: ignore[import]
                 with torch.no_grad():
                     tensor = torch.from_numpy(preprocessed)
                     output = self.model(tensor)

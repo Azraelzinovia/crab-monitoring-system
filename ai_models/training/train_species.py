@@ -3,13 +3,31 @@ Training Script — Species Classifier
 Fine-tune EfficientNet-B0 pada dataset kepiting Indonesia
 """
 
-import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import DataLoader, Dataset
-from torchvision import transforms, models
+try:
+    import torch                                    # type: ignore[import]
+    import torch.nn as nn                           # type: ignore[import]
+    import torch.optim as optim                     # type: ignore[import]
+    from torch.utils.data import DataLoader, Dataset  # type: ignore[import]
+    from torchvision import transforms, models      # type: ignore[import]
+    TORCH_AVAILABLE = True
+except ImportError:
+    torch = None        # type: ignore[assignment]
+    nn = None           # type: ignore[assignment]
+    optim = None        # type: ignore[assignment]
+    DataLoader = None   # type: ignore[assignment]
+    Dataset = None      # type: ignore[assignment]
+    transforms = None   # type: ignore[assignment]
+    models = None       # type: ignore[assignment]
+    TORCH_AVAILABLE = False
+
+try:
+    import cv2          # type: ignore[import]
+    CV2_AVAILABLE = True
+except ImportError:
+    cv2 = None          # type: ignore[assignment]
+    CV2_AVAILABLE = False
+
 from pathlib import Path
-import cv2
 import numpy as np
 import json
 import logging
