@@ -1,4 +1,4 @@
-"""
+﻿"""
 YOLOv8 Crab Detector
 Mendeteksi kepiting dalam frame menggunakan YOLOv8 dengan ByteTrack tracking.
 """
@@ -54,7 +54,7 @@ class YOLOCrabDetector:
     def _load_model(self):
         """Load YOLOv8 model with fallback to ONNX."""
         try:
-            from ultralytics import YOLO
+            from ultralytics import YOLO  # type: ignore[import]
 
             if os.path.exists(self.model_path):
                 self.model = YOLO(self.model_path)

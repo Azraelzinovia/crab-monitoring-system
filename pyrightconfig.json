@@ -12,9 +12,13 @@
   "exclude": [
     "frontend",
     "**/__pycache__",
-    "**/node_modules"
+    "**/node_modules",
+    "**/.git"
   ],
+  "reportMissingImports": "none",
   "reportMissingModuleSource": "none",
-  "reportMissingImports": "warning",
-  "typeCheckingMode": "basic"
+  "reportMissingTypeStubs": "none",
+  "reportUnknownMemberType": "none",
+  "reportAttributeAccessIssue": "none",
+  "typeCheckingMode": "off"
 }

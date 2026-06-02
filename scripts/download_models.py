@@ -1,4 +1,4 @@
-"""
+﻿"""
 Download Models Script
 Download YOLOv8 base model dan model pre-trained jika tersedia
 Jalankan: python scripts/download_models.py
@@ -59,7 +59,7 @@ def main():
 
     # Check ultralytics
     try:
-        from ultralytics import YOLO
+        from ultralytics import YOLO  # type: ignore[import]
         print("✅ ultralytics tersedia")
         use_ultralytics = True
     except ImportError:
@@ -82,7 +82,7 @@ def main():
         if use_ultralytics:
             try:
                 print(f"\n📥 Downloading via ultralytics: {model['filename']}")
-                from ultralytics import YOLO
+                from ultralytics import YOLO  # type: ignore[import]
                 YOLO(model["filename"])  # auto-download ke cache
                 import shutil, torch
                 cache_path = Path(torch.hub.get_dir()) / "ultralytics" / "assets" / model["filename"]

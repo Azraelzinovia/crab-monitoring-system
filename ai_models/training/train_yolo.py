@@ -1,4 +1,4 @@
-"""
+﻿"""
 YOLOv8 Training Script — Crab Detection
 Train custom YOLO model pada dataset kepiting
 """
@@ -64,7 +64,7 @@ def train():
         return
 
     try:
-        from ultralytics import YOLO
+        from ultralytics import YOLO  # type: ignore[import]
     except ImportError:
         logger.error("ultralytics tidak terinstall. Jalankan: pip install ultralytics")
         return
@@ -135,7 +135,7 @@ def validate():
         logger.error(f"Model tidak ditemukan: {model_path}")
         return
 
-    from ultralytics import YOLO
+    from ultralytics import YOLO  # type: ignore[import]
     model = YOLO(str(model_path))
     results = model.val(data=CONFIG["dataset_yaml"], device=CONFIG["device"])
     logger.info(f"Validation mAP50: {results.box.map50:.3f}")
@@ -148,7 +148,7 @@ def benchmark():
         logger.error("Model belum ditraining")
         return
 
-    from ultralytics import YOLO
+    from ultralytics import YOLO  # type: ignore[import]
     import numpy as np, time
 
     model = YOLO(str(model_path))
