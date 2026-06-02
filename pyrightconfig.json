@@ -3,6 +3,24 @@
   "pythonPlatform": "Linux",
   "venvPath": ".",
   "venv": ".venv",
+  "executionEnvironments": [
+    {
+      "root": "backend",
+      "extraPaths": ["backend"]
+    },
+    {
+      "root": "ai_models",
+      "extraPaths": ["ai_models", "backend"]
+    },
+    {
+      "root": "scraping",
+      "extraPaths": ["scraping", "backend"]
+    },
+    {
+      "root": "scripts",
+      "extraPaths": ["scripts", "backend"]
+    }
+  ],
   "include": [
     "backend",
     "ai_models",
@@ -18,7 +36,5 @@
   "reportMissingImports": "none",
   "reportMissingModuleSource": "none",
   "reportMissingTypeStubs": "none",
-  "reportUnknownMemberType": "none",
-  "reportAttributeAccessIssue": "none",
-  "typeCheckingMode": "off"
+  "typeCheckingMode": "basic"
 }
